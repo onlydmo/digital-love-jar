@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import LoveJar from './components/LoveJar';
-import AdminDashboard from './components/AdminDashboard';
+const LoveJar = React.lazy(() => import('./components/LoveJar'));
+const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
+const JourneyPage = React.lazy(() => import('./components/JourneyPage'));
+const SettingsPage = React.lazy(() => import('./components/SettingsPage'));
+const ProfilePage = React.lazy(() => import('./components/ProfilePage'));
+
 import LoginPage from './components/LoginPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider, useToast } from './context/ToastContext';
 import { JarProvider } from './context/JarContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { supabase } from './lib/supabase';
-
-import JourneyPage from './components/JourneyPage';
 import NavigationBar from './components/NavigationBar';
-import SettingsPage from './components/SettingsPage';
-import ProfilePage from './components/ProfilePage';
+import SkeletonLoader from './components/ui/SkeletonLoader';
+
 
 import { TutorialProvider, useTutorial } from './context/TutorialContext';
 import TutorialOverlay from './components/TutorialOverlay';
@@ -162,12 +164,19 @@ const AppContent = () => {
         </button>
       </div>
 
-      {currentView === 'jar' && <LoveJar />}
-      {currentView === 'journey' && <JourneyPage />}
-      {currentView === 'admin' && <AdminDashboard />}
-      {currentView === 'studio' && <AdminDashboard initialTab="create" />}
-      {currentView === 'settings' && <SettingsPage />}
-      {currentView === 'profile' && <ProfilePage />}
+      <React.Suspense fallback={
+        <div className="p-8 space-y-8 animate-in fade-in duration-500">
+          <div className="h-10 w-48 bg-white/10 rounded-xl mb-4"></div>
+          <SkeletonLoader type={currentView === 'jar' ? 'note' : 'card'} count={currentView === 'jar' ? 6 : 3} />
+        </div>
+      }>
+        {currentView === 'jar' && <LoveJar />}
+        {currentView === 'journey' && <JourneyPage />}
+        {currentView === 'admin' && <AdminDashboard />}
+        {currentView === 'studio' && <AdminDashboard initialTab="create" />}
+        {currentView === 'settings' && <SettingsPage />}
+        {currentView === 'profile' && <ProfilePage />}
+      </React.Suspense>
 
       <NavigationBar currentView={currentView} onViewChange={handleViewChange} />
 

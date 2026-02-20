@@ -1,0 +1,17 @@
+{
+    "name": "Digital Love Jar",
+    "short_name": "Love Jar",
+    "description": "A secure, shared space for your digital memories.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f0508",
+    "theme_color": "#0f0508",
+    "icons": [
+        {
+            "src": "/icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
