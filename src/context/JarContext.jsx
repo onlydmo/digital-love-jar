@@ -17,28 +17,32 @@ export const JarProvider = ({ children }) => {
 
         fetchNotes();
 
-        // Realtime subscription
-        const channel = supabase.channel('public:notes_global')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notes' }, payload => {
-                const newNoteId = payload.new.id;
-                console.log("New note detected:", newNoteId);
+        // Realtime subscription - filtered to our couple
+        const channel = supabase.channel(`public:notes_couple_${couple.id}`)
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'notes',
+                filter: `couple_id=eq.${couple.id}`
+            }, payload => {
+                if (payload.eventType === 'INSERT') {
 
-                // Add to sparkles
-                setSparkleIds(prev => [...prev, newNoteId]);
+                    const newNoteId = payload.new.id;
+                    console.log("New note detected:", newNoteId);
 
-                // Remove from sparkles after 8s
-                setTimeout(() => {
-                    setSparkleIds(prev => prev.filter(id => id !== newNoteId));
-                }, 8000);
+                    // Add to sparkles
+                    setSparkleIds(prev => [...prev, newNoteId]);
 
-                // Add new note to list immediately
-                setNotes(prev => [...prev, payload.new].sort((a, b) => new Date(a.date) - new Date(b.date)));
-            })
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notes' }, payload => {
-                setNotes(prev => prev.map(n => n.id === payload.new.id ? payload.new : n));
-            })
-            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'notes' }, payload => {
-                setNotes(prev => prev.filter(n => n.id !== payload.old.id));
+                    // Remove from sparkles after 8s
+                    setTimeout(() => {
+                        setSparkleIds(prev => prev.filter(id => id !== newNoteId));
+                    }, 8000);
+
+                } else if (payload.eventType === 'UPDATE') {
+                    setNotes(prev => prev.map(n => n.id === payload.new.id ? payload.new : n));
+                } else if (payload.eventType === 'DELETE') {
+                    setNotes(prev => prev.filter(n => n.id !== payload.old.id));
+                }
             })
             .subscribe();
 
@@ -49,6 +53,7 @@ export const JarProvider = ({ children }) => {
         const { data, error } = await supabase
             .from('notes')
             .select('*')
+            .eq('couple_id', couple.id)
             .order('date', { ascending: true });
 
         if (!error && data) {

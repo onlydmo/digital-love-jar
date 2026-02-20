@@ -30,8 +30,13 @@ const AdminDashboard = ({ initialTab }) => {
         fetchNotes();
 
         // Realtime subscription for instant updates (e.g. when partner opens a note)
-        const channel = supabase.channel('public:notes_dashboard')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'notes' }, () => {
+        const channel = supabase.channel(`public:notes_dashboard_${couple.id}`)
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'notes',
+                filter: `couple_id=eq.${couple.id}`
+            }, () => {
                 fetchNotes();
             })
             .subscribe();
@@ -44,6 +49,7 @@ const AdminDashboard = ({ initialTab }) => {
         const { data, error } = await supabase
             .from('notes')
             .select('*')
+            .eq('couple_id', couple.id)
             .order('date', { ascending: true });
 
         if (error) console.error("Error fetching notes:", error);

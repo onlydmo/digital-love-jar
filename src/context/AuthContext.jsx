@@ -18,11 +18,15 @@ export const AuthProvider = ({ children }) => {
 
             if (session) {
                 console.log("[Auth] Session found:", session.user.id);
-                // Try to fetch couple data (RLS will ensure we only get ours)
-                const { data, error } = await supabase
-                    .from('couples')
-                    .select('*')
-                    .maybeSingle();
+                // Prioritize the couple matching our local code if we have one
+                const storedCode = localStorage.getItem('love_jar_code');
+                let query = supabase.from('couples').select('*');
+
+                if (storedCode) {
+                    query = query.eq('secret_code', storedCode);
+                }
+
+                const { data, error } = await query.order('created_at', { ascending: false }).maybeSingle();
 
                 if (data && !error) {
                     console.log("[Auth] Restored session for couple:", data.id);
