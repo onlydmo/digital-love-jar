@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
-const LoveJar = React.lazy(() => import('./components/LoveJar'));
-const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
-const JourneyPage = React.lazy(() => import('./components/JourneyPage'));
-const SettingsPage = React.lazy(() => import('./components/SettingsPage'));
-const ProfilePage = React.lazy(() => import('./components/ProfilePage'));
+// Helper for robust lazy loading (reloads on chunk failure)
+
+const lazyWithRetry = (componentImport) => {
+  return React.lazy(async () => {
+    try {
+      return await componentImport();
+    } catch (error) {
+      console.error("[App] Chunk load failed. Force reloading...", error);
+      window.location.reload();
+      return { default: () => null }; // Fallback while reloading
+    }
+  });
+};
+
+const LoveJar = lazyWithRetry(() => import('./components/LoveJar'));
+const AdminDashboard = lazyWithRetry(() => import('./components/AdminDashboard'));
+const JourneyPage = lazyWithRetry(() => import('./components/JourneyPage'));
+const SettingsPage = lazyWithRetry(() => import('./components/SettingsPage'));
+const ProfilePage = lazyWithRetry(() => import('./components/ProfilePage'));
 
 import LoginPage from './components/LoginPage';
+
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider, useToast } from './context/ToastContext';
 import { JarProvider } from './context/JarContext';
