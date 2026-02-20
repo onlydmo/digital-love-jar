@@ -1,0 +1,293 @@
+@import "tailwindcss";
+
+:root {
+  /* Default Theme (Night) Variables - The Source of Truth */
+  --color-primary-val: #ffbd59;
+  --color-gold-val: #ffbd59;
+  --color-pink-val: #ff9fb2;
+  --color-wine-light-val: #3d1425;
+  --color-wine-muted-val: #492222;
+  --color-gold-soft-val: #cb9090;
+
+  --color-bg-light-val: #f8f8f5;
+  --color-bg-dark-val: #2a0a18;
+
+  /* Fonts */
+  --font-display-val: "Manrope", "Inter", sans-serif;
+  --font-handwriting-val: "Caveat", cursive;
+}
+
+@theme {
+  /* Map Tailwind Utilities to Dynamic Variables */
+  --color-primary: var(--color-primary-val);
+  --color-gold: var(--color-gold-val);
+  --color-pink: var(--color-pink-val);
+  --color-wine-light: var(--color-wine-light-val);
+  --color-wine-muted: var(--color-wine-muted-val);
+  --color-gold-soft: var(--color-gold-soft-val);
+
+  --color-background-light: var(--color-bg-light-val);
+  --color-background-dark: var(--color-bg-dark-val);
+
+  /* Fonts */
+  --font-display: var(--font-display-val);
+  --font-handwriting: var(--font-handwriting-val);
+
+  /* Border Radius */
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+/* Sunset Theme Overrides */
+.theme-sunset {
+  --color-primary-val: #ff8c61;
+  /* Warm Coral */
+  --color-gold-val: #ffd166;
+  /* Golden Yellow */
+  --color-pink-val: #ef476f;
+  /* Hot Pink */
+  --color-wine-light-val: #4a2028;
+  /* Warm Cocoa */
+  --color-wine-muted-val: #5e2a33;
+  /* Muted Red-Brown */
+  --color-gold-soft-val: #fdb094;
+  /* Soft Peach */
+  --color-bg-dark-val: #2d1b22;
+  /* Dark Warm Brown */
+}
+
+/* Rain Theme Overrides */
+.theme-rain {
+  --color-primary-val: #4cc9f0;
+  /* Sky Blue */
+  --color-gold-val: #72efdd;
+  /* Teal/Aqua */
+  --color-pink-val: #5390d9;
+  /* Medium Blue */
+  --color-wine-light-val: #162a38;
+  /* Deep Slate */
+  --color-wine-muted-val: #1f3a4d;
+  /* Muted Slate */
+  --color-gold-soft-val: #93c5fd;
+  /* Soft Blue */
+  --color-bg-dark-val: #0f172a;
+  /* Dark Navy */
+}
+
+/* Midnight Theme Overrides */
+.theme-midnight {
+  --color-primary-val: #a78bfa;
+  /* Purple */
+  --color-gold-val: #c4b5fd;
+  /* Soft Violet */
+  --color-pink-val: #f472b6;
+  /* Pink */
+  --color-wine-light-val: #1e1b4b;
+  /* Deep Indigo */
+  --color-wine-muted-val: #312e81;
+  /* Indigo */
+  --color-gold-soft-val: #ddd6fe;
+  /* Pale Violet */
+  --color-bg-dark-val: #020617;
+  /* Pitch Black/Blue */
+}
+
+/* Global Styles */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-bg-dark-val);
+  /* Use the dynamic var */
+  color: white;
+  /* We might want this dynamic too, but white works for now */
+  font-family: var(--font-display-val);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.5s ease;
+  /* Smooth transition */
+}
+
+/* Utilities from Design */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-morphism {
+  background: rgba(73, 34, 34, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-jar {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.05);
+  border-radius: 40px 40px 20px 20px;
+}
+
+.jar-rim {
+  border-bottom: 4px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
+}
+
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.4'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(255, 189, 89, 0.2);
+}
+
+.glow-pink {
+  box-shadow: 0 0 20px rgba(255, 159, 178, 0.2);
+}
+
+.jar-glow {
+  box-shadow: 0 0 60px 10px rgba(244, 37, 37, 0.2);
+}
+
+.wooden-shelf {
+  background: linear-gradient(to bottom, #2d161a 0%, #1a0a0d 100%);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+/* Note Rotations */
+.note-pink {
+  background-color: #fce7f3;
+  color: #9d174d;
+  transform: rotate(-3deg);
+}
+
+.note-yellow {
+  background-color: #fef9c3;
+  color: #854d0e;
+  transform: rotate(2deg);
+}
+
+.note-blue {
+  background-color: #dbeafe;
+  color: #1e40af;
+  transform: rotate(-1deg);
+}
+
+.note-green {
+  background-color: #dcfce7;
+  color: #166534;
+  transform: rotate(4deg);
+}
+
+/* Animations */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.jar-note-glow {
+  animation: pulse-glow 2s infinite;
+  z-index: 50 !important;
+}
+
+@keyframes twinkle {
+
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+.animate-twinkle {
+  animation: twinkle var(--twinkle-duration, 3s) ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+}
