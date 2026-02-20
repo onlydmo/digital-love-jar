@@ -37,15 +37,22 @@ const TutorialOverlay = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-6 pointer-events-auto cursor-default"
                 onClick={completeTutorial}
             >
                 <motion.div
                     initial={{ scale: 0.9, y: 20 }}
                     animate={{ scale: 1, y: 0 }}
-                    className="bg-background-dark border border-gold/30 p-8 rounded-3xl max-w-sm text-center shadow-[0_0_50px_rgba(255,215,0,0.15)] relative overflow-hidden"
+                    className="bg-background-dark border border-gold/30 p-8 rounded-3xl max-w-sm text-center shadow-[0_0_80px_rgba(0,0,0,0.8)] relative overflow-hidden pointer-events-auto"
                     onClick={(e) => e.stopPropagation()}
                 >
+                    <button
+                        onClick={completeTutorial}
+                        className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+                    >
+                        <span className="material-symbols-outlined">close</span>
+                    </button>
+
                     {/* Decorative Shine */}
                     <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-br from-transparent via-white/5 to-transparent rotate-45 pointer-events-none"></div>
 
