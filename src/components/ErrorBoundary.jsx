@@ -13,7 +13,18 @@ class ErrorBoundary extends React.Component {
     componentDidCatch(error, errorInfo) {
         this.setState({ error, errorInfo });
         console.error("Uncaught error:", error, errorInfo);
+
+        // Detect Vercel/Vite deployment mismatch (Failed to fetch dynamically imported module)
+        const errorMessage = error?.toString() || "";
+        if (errorMessage.includes("Failed to fetch") || errorMessage.includes("ChunkLoadError") || errorMessage.includes("dynamically imported module")) {
+            console.warn("[ErrorBoundary] Deployment mismatch detected. Auto-refreshing...");
+            // Add a small delay to avoid infinite loops if it's a real network error
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
     }
+
 
     render() {
         if (this.state.hasError) {
