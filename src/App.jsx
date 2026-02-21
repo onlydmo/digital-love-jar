@@ -93,37 +93,44 @@ const AppContent = () => {
     }
 
     // 2. Realtime Listener
-    const channel = supabase.channel('public:notes_notifications')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notes', filter: `couple_id=eq.${couple.id}` }, (payload) => {
-        // Check if WE sent it (debounce check)
-        const lastSent = parseInt(localStorage.getItem('love_jar_last_sent') || '0');
-        const timeSinceSend = Date.now() - lastSent;
+    let channel;
+    try {
+      channel = supabase.channel('public:notes_notifications')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notes', filter: `couple_id=eq.${couple.id}` }, (payload) => {
+          // Check if WE sent it (debounce check)
+          const lastSent = parseInt(localStorage.getItem('love_jar_last_sent') || '0');
+          const timeSinceSend = Date.now() - lastSent;
 
-        // If we sent a message < 5 seconds ago, assume this INSERT is ours and ignore
-        if (timeSinceSend < 5000) {
-          console.log("[App] Notification suppressed (Self-sent)");
-          return;
-        }
+          // If we sent a message < 5 seconds ago, assume this INSERT is ours and ignore
+          if (timeSinceSend < 5000) {
+            console.log("[App] Notification suppressed (Self-sent)");
+            return;
+          }
 
-        // Otherwise, it's a new note from partner!
-        const note = payload.new;
-        console.log("[App] New Note Received!", note);
+          // Otherwise, it's a new note from partner!
+          const note = payload.new;
+          console.log("[App] New Note Received!", note);
 
-        // Trigger System Notification
-        if (Notification.permission === 'granted') {
-          new Notification("New Memory in the Jar! 💌", {
-            body: "Someone left a note for you... Tap to see.",
-            icon: '/icon.png', // Fallback, browser often uses favicon or system icon
-            badge: '/icon.png'
-          });
-        } else {
-          // Fallback to in-app toast
-          addToast("New Memory Received! 💌", 'success');
-        }
-      })
-      .subscribe();
+          // Trigger System Notification
+          if (Notification.permission === 'granted') {
+            new Notification("New Memory in the Jar! 💌", {
+              body: "Someone left a note for you... Tap to see.",
+              icon: '/icon.png',
+              badge: '/icon.png'
+            });
+          } else {
+            // Fallback to in-app toast
+            addToast("New Memory Received! 💌", 'success');
+          }
+        })
+        .subscribe();
+    } catch (err) {
+      console.warn("[App] Realtime notification listener failed (WebSocket unavailable). Notifications will not be live.", err);
+    }
 
-    return () => supabase.removeChannel(channel);
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
 
   }, [couple, addToast]);
 

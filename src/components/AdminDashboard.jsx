@@ -30,18 +30,28 @@ const AdminDashboard = ({ initialTab }) => {
         fetchNotes();
 
         // Realtime subscription for instant updates (e.g. when partner opens a note)
-        const channel = supabase.channel(`public:notes_dashboard_${couple.id}`)
-            .on('postgres_changes', {
-                event: '*',
-                schema: 'public',
-                table: 'notes',
-                filter: `couple_id=eq.${couple.id}`
-            }, () => {
-                fetchNotes();
-            })
-            .subscribe();
+        let channel;
+        try {
+            channel = supabase.channel(`public:notes_dashboard_${couple.id}`)
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'notes',
+                    filter: `couple_id=eq.${couple.id}`
+                }, () => {
+                    fetchNotes();
+                })
+                .subscribe();
+        } catch (err) {
+            console.warn("[AdminDashboard] Realtime subscription failed. Using polling fallback.", err);
+        }
 
-        return () => supabase.removeChannel(channel);
+        const pollInterval = setInterval(fetchNotes, 30000);
+
+        return () => {
+            clearInterval(pollInterval);
+            if (channel) supabase.removeChannel(channel);
+        };
     }, [couple]);
 
     const fetchNotes = async () => {
