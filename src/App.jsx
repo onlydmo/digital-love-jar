@@ -31,14 +31,17 @@ import SkeletonLoader from './components/ui/SkeletonLoader';
 
 
 import { TutorialProvider, useTutorial } from './context/TutorialContext';
+import { useJar } from './context/JarContext';
 import TutorialOverlay from './components/TutorialOverlay';
 import { themes } from './lib/themes';
 
 const AppContent = () => {
   const { couple, loading } = useAuth();
+  const { notes } = useJar();
   const { addToast } = useToast();
   const { startTutorial } = useTutorial();
   const [currentView, setCurrentView] = useState('jar');
+  const [viewMode, setViewMode] = useState('jar'); // JAR or GRID view for the 'jar' layout
 
   // Check for New User Onboarding
   useEffect(() => {
@@ -161,37 +164,71 @@ const AppContent = () => {
   return (
     <div className={`font-sans antialiased bg-background-dark min-h-screen text-white pb-20 ${ambienceClass}`}>
 
-      {/* Global Header (Settings & Profile) */}
-      <div className="fixed top-6 right-6 z-50 flex gap-4">
-        <button className="p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-colors" onClick={() => handleViewChange('settings')}>
-          <span className="material-symbols-outlined text-white/70">settings</span>
-        </button>
-
-        <button
-          className="h-12 w-12 rounded-full border-2 border-primary/50 overflow-hidden flex items-center justify-center bg-black/40 backdrop-blur-md text-xs font-bold shadow-lg hover:scale-105 transition-transform"
-          onClick={() => handleViewChange('profile')}
-        >
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-          ) : (
-            <span className="material-symbols-outlined text-white/70">person</span>
-          )}
-        </button>
-      </div>
-
-      <React.Suspense fallback={
-        <div className="p-8 space-y-8 animate-in fade-in duration-500">
-          <div className="h-10 w-48 bg-white/10 rounded-xl mb-4"></div>
-          <SkeletonLoader type={currentView === 'jar' ? 'note' : 'card'} count={currentView === 'jar' ? 6 : 3} />
+      {/* Unified Global Header */}
+      <header className="fixed top-0 left-0 right-0 z-[100] px-6 py-4 md:px-12 md:py-8 flex items-center justify-between bg-gradient-to-b from-background-dark/80 to-transparent backdrop-blur-sm">
+        {/* Left: Logo & Counter */}
+        <div className="flex items-center gap-4">
+          <div className="bg-primary/20 p-2 rounded-xl backdrop-blur-md border border-white/10 shadow-lg shadow-primary/10">
+            <span className="material-symbols-outlined text-primary text-2xl">auto_awesome</span>
+          </div>
+          <div>
+            <h1 className="font-bold text-lg md:text-xl tracking-tight leading-none">The Love Jar</h1>
+            <div className="flex items-center gap-3 mt-1.5">
+              <p className="text-[10px] md:text-xs text-secondary uppercase tracking-[0.2em] font-black">
+                {notes?.length || 0} Memories
+              </p>
+              {currentView === 'jar' && (
+                <button
+                  onClick={() => setViewMode(viewMode === 'jar' ? 'grid' : 'jar')}
+                  className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-[9px] font-bold text-white/40 hover:text-white uppercase tracking-tighter"
+                >
+                  <span className="material-symbols-outlined text-[12px]">{viewMode === 'jar' ? 'grid_view' : 'close_fullscreen'}</span>
+                  {viewMode === 'jar' ? 'Grid' : 'Jar'}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-      }>
-        {currentView === 'jar' && <LoveJar />}
-        {currentView === 'journey' && <JourneyPage />}
-        {currentView === 'admin' && <AdminDashboard />}
-        {currentView === 'studio' && <AdminDashboard initialTab="create" />}
-        {currentView === 'settings' && <SettingsPage />}
-        {currentView === 'profile' && <ProfilePage />}
-      </React.Suspense>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-3">
+          <button
+            className="p-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all hover:scale-110 active:scale-95 shadow-lg"
+            onClick={() => handleViewChange('settings')}
+            title="Settings"
+          >
+            <span className="material-symbols-outlined text-white/70 text-xl">settings</span>
+          </button>
+
+          <button
+            className="h-11 w-11 rounded-full border-2 border-primary/30 overflow-hidden flex items-center justify-center bg-black/40 backdrop-blur-md shadow-xl hover:scale-105 transition-transform"
+            onClick={() => handleViewChange('profile')}
+            title="Profile"
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <span className="material-symbols-outlined text-white/70">person</span>
+            )}
+          </button>
+        </div>
+      </header>
+
+      <div className="pt-24 md:pt-32">
+        <React.Suspense fallback={
+          <div className="p-8 space-y-8 animate-in fade-in duration-500">
+            <div className="h-10 w-48 bg-white/10 rounded-xl mb-4"></div>
+            <SkeletonLoader type={currentView === 'jar' ? 'note' : 'card'} count={currentView === 'jar' ? 6 : 3} />
+          </div>
+        }>
+          {currentView === 'jar' && <LoveJar viewMode={viewMode} setViewMode={setViewMode} />}
+          {currentView === 'journey' && <JourneyPage />}
+          {currentView === 'admin' && <AdminDashboard />}
+          {currentView === 'studio' && <AdminDashboard initialTab="create" />}
+          {currentView === 'settings' && <SettingsPage />}
+          {currentView === 'profile' && <ProfilePage />}
+        </React.Suspense>
+      </div>
 
       <NavigationBar currentView={currentView} onViewChange={handleViewChange} />
 

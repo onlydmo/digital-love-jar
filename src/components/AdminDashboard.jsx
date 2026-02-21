@@ -204,19 +204,12 @@ const AdminDashboard = ({ initialTab }) => {
             <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-pink/20 rounded-full blur-[120px] pointer-events-none"></div>
             <div className="fixed bottom-[-5%] right-[-5%] w-[35%] h-[35%] bg-gold/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-            <main className="relative z-10 flex-grow p-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full space-y-8">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                    <div>
-                        <button
-                            onClick={() => window.location.hash = 'jar'}
-                            className="inline-flex items-center gap-2 text-gold/80 hover:text-gold mb-4 transition-colors font-bold uppercase tracking-widest text-xs"
-                        >
-                            <span className="material-symbols-outlined text-sm">arrow_back</span>
-                            Back to Jar
-                        </button>
-                        <h1 className="font-handwriting text-5xl md:text-6xl text-gold mb-2">Love Insights & Connection Stats</h1>
-                        <p className="text-pink/80 text-lg">A magical look at your journey together</p>
+            <main className="relative z-10 flex-grow p-6 md:p-12 max-w-7xl mx-auto w-full space-y-12">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 pt-4">
+                    <div className="max-w-2xl">
+                        <h1 className="font-handwriting text-5xl md:text-7xl text-gold mb-4 leading-tight">Love Insights & Connection Stats</h1>
+                        <p className="text-pink/60 text-lg md:text-xl font-medium">A magical look at your journey together, one heartbeat at a time.</p>
                     </div>
 
                     {/* Streak Badge */}

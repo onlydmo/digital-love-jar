@@ -12,11 +12,10 @@ import FoldedNote from './FoldedNote';
 
 const NOTE_COLORS = ['note-pink', 'note-yellow', 'note-blue', 'note-green'];
 
-const LoveJar = () => {
+const LoveJar = ({ viewMode, setViewMode }) => {
     const { couple } = useAuth();
-    const { notes, loading, sparkleIds, fetchNotes, updateNote } = useJar();
+    const { notes, loading, sparkleIds, updateNote } = useJar();
     const [selectedNote, setSelectedNote] = useState(null);
-    const [viewMode, setViewMode] = useState('jar'); // 'jar' or 'grid'
 
     const handleNoteClick = async (note) => {
         setSelectedNote(note);
@@ -80,19 +79,6 @@ const LoveJar = () => {
     return (
         <div className="flex flex-col min-h-screen bg-transparent text-white overflow-hidden relative">
 
-            {/* Top Nav - Simplified for Global Layout */}
-            <header className="relative z-20 flex items-center justify-between px-8 py-6 w-full pointer-events-none">
-                <div className="flex items-center gap-3 pointer-events-auto">
-                    <div className="p-2 bg-primary rounded-lg shadow-lg shadow-primary/20">
-                        <span className="material-symbols-outlined text-white">auto_awesome</span>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold tracking-tight leading-none">Our Shared Jar</h2>
-                        <p className="text-[10px] text-white/50 uppercase tracking-widest font-bold mt-1">{notes.length} Memories Collected</p>
-                    </div>
-                </div>
-                {/* Settings & Profile moved to App.jsx */}
-            </header>
 
             <main className="relative flex-1 flex flex-col items-center justify-center overflow-hidden">
                 {/* Warm background glow */}
@@ -100,15 +86,6 @@ const LoveJar = () => {
 
 
 
-                {/* Floating Add Button */}
-                <button onClick={() => window.location.hash = 'studio'} className="absolute right-10 bottom-48 z-30 group">
-                    <div className="bg-primary hover:bg-primary/90 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(218,11,63,0.5)] transition-all transform group-hover:scale-110 active:scale-95">
-                        <span className="material-symbols-outlined text-3xl">add</span>
-                    </div>
-                    <span className="absolute right-20 top-1/2 -translate-y-1/2 bg-black/60 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-                        ADD NEW MEMORY
-                    </span>
-                </button>
 
                 {/* Main Content Area */}
                 <div className={`relative w-full h-full flex items-center justify-center transition-all duration-500 ${viewMode === 'grid' ? 'p-10 pb-40 overflow-y-auto items-start' : 'pb-32'}`}>
@@ -139,21 +116,22 @@ const LoveJar = () => {
 
                                 {/* Empty State */}
                                 {notes.length === 0 && (
-                                    <div className="absolute inset-0 flex items-center justify-center text-white/30 font-handwriting text-2xl text-center p-8">
-                                        The jar is empty...<br />Start adding memories!
+                                    <div className="absolute inset-0 flex items-center justify-center text-white/20 font-handwriting text-3xl text-center p-8 leading-relaxed tracking-wide animate-pulse">
+                                        The jar is empty...<br />
+                                        <span className="text-lg opacity-50">Start adding memories!</span>
                                     </div>
                                 )}
                             </div>
                             {/* Reflection */}
                             <div className="absolute inset-0 pointer-events-none rounded-[inherit] bg-gradient-to-tr from-white/5 via-transparent to-white/10"></div>
 
-                            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-white/30 text-xs font-medium tracking-widest opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                TAP TO OPEN JAR
+                            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-white/20 text-[10px] font-bold tracking-[0.3em] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase">
+                                Tap to Open
                             </div>
                         </div>
                     ) : (
                         /* GRID VIEW */
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl animate-in fade-in zoom-in-95 duration-500">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full max-w-6xl animate-in fade-in zoom-in-95 duration-700 pt-10">
                             {notes.map((note, index) => {
                                 // Simple random rotation for grid items too
                                 const rotate = (index % 6) - 3;
@@ -164,7 +142,7 @@ const LoveJar = () => {
                                     return (
                                         <FoldedNote
                                             key={note.id}
-                                            className="aspect-square p-6 rounded-sm cursor-pointer transform hover:scale-105 hover:z-10 transition-all duration-300"
+                                            className="aspect-square p-6 rounded-sm cursor-pointer transform hover:scale-105 hover:z-10 transition-all duration-300 shadow-xl"
                                             style={{ transform: `rotate(${rotate}deg)` }}
                                             onClick={() => handleNoteClick(note)}
                                             date={format(new Date(note.date), 'MMM do')}
@@ -175,14 +153,14 @@ const LoveJar = () => {
                                 return (
                                     <div
                                         key={note.id}
-                                        className={`${colorClass} aspect-square p-6 rounded-sm shadow-lg text-black/80 cursor-pointer transform hover:scale-105 hover:z-10 transition-all duration-300 flex flex-col ${isSparkling ? 'jar-note-glow scale-110 z-50' : ''}`}
+                                        className={`${colorClass} aspect-square p-6 rounded-sm shadow-xl text-black/80 cursor-pointer transform hover:scale-105 hover:z-10 transition-all duration-300 flex flex-col ${isSparkling ? 'jar-note-glow scale-110 z-50' : ''}`}
                                         style={{ transform: `rotate(${rotate}deg)` }}
                                         onClick={() => handleNoteClick(note)}
                                     >
                                         {isSparkling && <NoteSparkles />}
                                         <div className="flex justify-between items-center mb-4 border-b border-black/10 pb-2">
-                                            <span className="font-bold text-xs uppercase tracking-wider opacity-60">{format(new Date(note.date), 'MMM do')}</span>
-                                            {note.is_opened && <span className="material-symbols-outlined text-black/30 text-sm">visibility</span>}
+                                            <span className="font-bold text-[10px] uppercase tracking-wider opacity-40">{format(new Date(note.date), 'MMM do')}</span>
+                                            {note.is_opened && <span className="material-symbols-outlined text-black/20 text-sm">visibility</span>}
                                         </div>
 
                                         <div className="flex-1 overflow-hidden relative">
@@ -197,7 +175,7 @@ const LoveJar = () => {
                                         </div>
 
                                         {(note.image_url || note.spotify_url) && (
-                                            <div className="mt-2 flex gap-2 justify-end opacity-50">
+                                            <div className="mt-2 flex gap-2 justify-end opacity-30">
                                                 {note.image_url && <span className="material-symbols-outlined text-sm">image</span>}
                                                 {note.spotify_url && <span className="material-symbols-outlined text-sm">music_note</span>}
                                             </div>
@@ -209,37 +187,8 @@ const LoveJar = () => {
                     )}
 
                     {/* Shadow (Only for Jar) */}
-                    {viewMode === 'jar' && <div className="absolute bottom-28 w-56 h-8 bg-black/60 blur-xl rounded-full z-0"></div>}
+                    {viewMode === 'jar' && <div className="absolute bottom-28 w-56 h-8 bg-black/60 blur-2xl rounded-full z-0 opacity-50"></div>}
                 </div>
-
-                {/* Shelf */}
-                <div className="absolute bottom-0 w-full h-32 wooden-shelf z-10 border-t border-white/5">
-                    <div className="absolute inset-0 shelf-texture"></div>
-                    {/* Shelf Details */}
-                    <div className="max-w-6xl mx-auto px-10 h-full flex items-center justify-between opacity-60">
-                        <div className="flex gap-8">
-                            <div className="flex flex-col">
-                                <span className="text-[10px] uppercase tracking-tighter text-white/40">Created</span>
-                                <span className="text-sm font-semibold">{couple ? format(new Date(couple.created_at), 'MMM yyyy') : 'Recently'}</span>
-                            </div>
-                        </div>
-
-                        {/* Toggle View Mode */}
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setViewMode(viewMode === 'jar' ? 'grid' : 'jar')}
-                                className={`px-6 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${viewMode === 'grid'
-                                    ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90 scale-105'
-                                    : 'bg-white/10 hover:bg-white/20 text-white'
-                                    }`}
-                            >
-                                <span className="material-symbols-outlined text-sm">{viewMode === 'jar' ? 'grid_view' : 'close_fullscreen'}</span>
-                                {viewMode === 'jar' ? 'View All Memories' : 'Stack in Jar'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
             </main>
 
             {/* Grain Overlay */}

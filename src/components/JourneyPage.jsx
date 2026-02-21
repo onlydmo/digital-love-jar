@@ -14,10 +14,6 @@ const JourneyPage = () => {
         <div className="min-h-screen bg-background-dark text-white pb-32 pt-24 px-4">
             <div className="grain-overlay"></div>
 
-            <header className="text-center mb-12 relative z-10">
-                <h1 className="font-handwriting text-6xl text-gold mb-2">Highlights</h1>
-                <p className="text-white/60 uppercase tracking-widest text-xs">Our most cherished memories</p>
-            </header>
 
             <div className="max-w-3xl mx-auto space-y-6 relative z-10">
                 {journeyNotes.map((note) => (

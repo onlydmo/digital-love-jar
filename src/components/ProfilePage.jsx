@@ -84,15 +84,6 @@ const ProfilePage = () => {
 
             <div className="max-w-2xl mx-auto space-y-12 relative z-10">
 
-                <header className="flex items-center gap-4 mb-8">
-                    <button onClick={() => window.history.back()} className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <div>
-                        <h1 className="font-handwriting text-5xl text-gold mb-2">Our Profile</h1>
-                        <p className="text-white/60">The story of us.</p>
-                    </div>
-                </header>
 
                 {/* 1. Connection Stats */}
                 <section className="glass p-8 rounded-3xl relative overflow-hidden text-center group">

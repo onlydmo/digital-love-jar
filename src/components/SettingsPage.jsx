@@ -74,15 +74,6 @@ const SettingsPage = () => {
         <div className="min-h-screen bg-background-dark text-white pb-32 pt-24 px-4">
             <div className="max-w-2xl mx-auto space-y-12">
 
-                <header className="flex items-center gap-4 mb-8">
-                    <button onClick={() => window.history.back()} className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
-                        <span className="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <div>
-                        <h1 className="font-handwriting text-5xl text-gold mb-2">Jar Settings</h1>
-                        <p className="text-white/60">Customize your shared space.</p>
-                    </div>
-                </header>
 
                 {/* 1. The Vibe */}
                 <section className="space-y-6">
