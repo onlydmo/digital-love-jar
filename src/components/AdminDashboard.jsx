@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { safeSetItem } from '../lib/safeStorage';
 import { useAuth } from '../context/AuthContext';
 import { format, addDays, startOfDay, differenceInDays } from 'date-fns';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "./ui/dialog";
@@ -138,7 +139,7 @@ const AdminDashboard = ({ initialTab }) => {
             console.error(error);
         } else {
             // Mark validation for notification filtering
-            localStorage.setItem('love_jar_last_sent', Date.now().toString());
+            safeSetItem('love_jar_last_sent', Date.now().toString());
 
             fetchNotes();
             setIsDialogOpen(false);

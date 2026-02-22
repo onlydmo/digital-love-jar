@@ -26,6 +26,7 @@ import { ToastProvider, useToast } from './context/ToastContext';
 import { JarProvider } from './context/JarContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { supabase } from './lib/supabase';
+import { safeGetItem, safeRemoveItem } from './lib/safeStorage';
 import NavigationBar from './components/NavigationBar';
 import SkeletonLoader from './components/ui/SkeletonLoader';
 
@@ -45,14 +46,14 @@ const AppContent = () => {
 
   // Check for New User Onboarding
   useEffect(() => {
-    if (couple && localStorage.getItem('love_jar_newly_created')) {
+    if (couple && safeGetItem('love_jar_newly_created')) {
       addToast(
         "Welcome! You can change your Secret Code anytime in Settings -> Profile.",
         'info',
         7000,
         'bottom-right'
       );
-      localStorage.removeItem('love_jar_newly_created');
+      safeRemoveItem('love_jar_newly_created');
 
       // Start the very first tutorial
       startTutorial('jar_intro');
@@ -81,7 +82,7 @@ const AppContent = () => {
     if (!couple) return;
 
     // 1. Request Permission if default (User asked for proactive prompt)
-    if (Notification.permission === 'default') {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
       const timer = setTimeout(() => {
         addToast(
           "Don't miss a beat! 💌 Enable notifications in Settings to know when a new memory arrives.",
@@ -98,7 +99,7 @@ const AppContent = () => {
       channel = supabase.channel('public:notes_notifications')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notes', filter: `couple_id=eq.${couple.id}` }, (payload) => {
           // Check if WE sent it (debounce check)
-          const lastSent = parseInt(localStorage.getItem('love_jar_last_sent') || '0');
+          const lastSent = parseInt(safeGetItem('love_jar_last_sent') || '0');
           const timeSinceSend = Date.now() - lastSent;
 
           // If we sent a message < 5 seconds ago, assume this INSERT is ours and ignore
@@ -112,7 +113,7 @@ const AppContent = () => {
           console.log("[App] New Note Received!", note);
 
           // Trigger System Notification
-          if (Notification.permission === 'granted') {
+          if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
             new Notification("New Memory in the Jar! 💌", {
               body: "Someone left a note for you... Tap to see.",
               icon: '/icon.png',

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
+import { safeSetItem } from '../lib/safeStorage';
 import { useToast } from '../context/ToastContext';
 import StarryBackground from './StarryBackground';
 import HelpModal from './HelpModal';
@@ -79,7 +80,7 @@ const LoginPage = () => {
 
         if (result.success) {
             addToast("Success! You are now connected. ✨", 'success');
-            localStorage.setItem('love_jar_newly_created', 'true');
+            safeSetItem('love_jar_newly_created', 'true');
         } else {
             addToast(`Creation Failed: ${result.error.message}`, 'error');
         }
@@ -100,16 +101,16 @@ const LoginPage = () => {
                 setRecoveryStep(2);
                 setError(false);
             } else {
-                alert("No connection found with that name, or no security question set.");
+                addToast("No connection found with that name, or no security question set.", 'error');
             }
         } else {
             if (recoveryData.answer && recoveryData._targetAnswer && recoveryData.answer.toLowerCase().trim() === recoveryData._targetAnswer.toLowerCase().trim()) {
-                alert(`SUCCESS! Your Secret Code is: ${recoveryData._revealCode}`);
+                addToast(`Your Secret Code is: ${recoveryData._revealCode}`, 'success', 15000);
                 setRecoveryMode(false);
                 setRecoveryStep(1);
                 setRecoveryData({ name: '', question: '', answer: '', coupleId: null });
             } else {
-                alert("Incorrect Answer.");
+                addToast("Incorrect Answer.", 'error');
             }
         }
     };

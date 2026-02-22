@@ -29,21 +29,43 @@ const FloatingActionMenu = () => {
 
     // 2. Connected Logic
     const sendBuzz = async () => {
-        const channel = supabase.channel(`room:${couple.id}`);
-        await channel.send({
-            type: 'broadcast',
-            event: 'buzz',
-            payload: { message: 'Thinking of you!' }
-        });
-        await supabase.from('buzzes').insert([{ couple_id: couple.id }]);
-        addToast("Love Buzz Sent! 💖");
+        try {
+            const channel = supabase.channel(`room:${couple.id}`);
+            await channel.send({
+                type: 'broadcast',
+                event: 'buzz',
+                payload: { message: 'Thinking of you!' }
+            });
+            await supabase.from('buzzes').insert([{ couple_id: couple.id }]);
+            addToast("Love Buzz Sent! 💖");
+        } catch (err) {
+            console.warn('[FloatingActionMenu] Buzz failed:', err);
+            addToast("Buzz couldn't be sent right now.", 'error');
+        }
         setIsOpen(false);
     };
 
-    const copyLink = () => {
+    const copyLink = async () => {
         const url = `${window.location.origin}/?code=${couple.secret_code}`;
-        navigator.clipboard.writeText(url);
-        addToast("Link Copied! Share it! 💌");
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(url);
+            } else {
+                // Fallback for older mobile browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
+            addToast("Link Copied! Share it! 💌");
+        } catch (err) {
+            console.warn('[FloatingActionMenu] Clipboard failed:', err);
+            addToast(url, 'info', 10000); // Show the URL directly so user can copy manually
+        }
         setIsOpen(false);
     };
 
@@ -63,7 +85,7 @@ const FloatingActionMenu = () => {
                             <span className="font-medium text-sm">Send Love</span>
                         </button>
 
-                        <button onClick={() => window.location.hash = '#admin'} className="bg-indigo-500 text-white p-3 rounded-full shadow-lg hover:bg-indigo-600 flex items-center gap-2 pr-4 transition-colors active:scale-95">
+                        <button onClick={() => window.location.hash = 'admin'} className="bg-indigo-500 text-white p-3 rounded-full shadow-lg hover:bg-indigo-600 flex items-center gap-2 pr-4 transition-colors active:scale-95">
                             <Plus className="w-5 h-5" />
                             <span className="font-medium text-sm">New Memory</span>
                         </button>

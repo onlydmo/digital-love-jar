@@ -134,6 +134,10 @@ const SettingsPage = () => {
                         </div>
                         <button
                             onClick={async () => {
+                                if (typeof Notification === 'undefined') {
+                                    addToast("Notifications are not supported in this browser.", 'error');
+                                    return;
+                                }
                                 const permission = await Notification.requestPermission();
                                 if (permission === 'granted') {
                                     addToast("Notifications enabled! You'll be the first to know. 💌", 'success');
@@ -141,9 +145,9 @@ const SettingsPage = () => {
                                     addToast("Notifications disabled. Check browser settings.", 'error');
                                 }
                             }}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors border ${Notification.permission === 'granted' ? 'bg-green-500/20 border-green-500/50 text-green-200' : 'bg-white/10 hover:bg-white/20 border-white/10'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors border ${typeof Notification !== 'undefined' && Notification.permission === 'granted' ? 'bg-green-500/20 border-green-500/50 text-green-200' : 'bg-white/10 hover:bg-white/20 border-white/10'}`}
                         >
-                            {Notification.permission === 'granted' ? 'Enabled' : 'Enable'}
+                            {typeof Notification !== 'undefined' ? (Notification.permission === 'granted' ? 'Enabled' : 'Enable') : 'Not Supported'}
                         </button>
                     </div>
                 </section>
@@ -186,10 +190,25 @@ const SettingsPage = () => {
 
                         {/* Share Link Button */}
                         <button
-                            onClick={() => {
+                            onClick={async () => {
                                 const link = `${window.location.origin}/?invite=${formData.secret_code}`;
-                                navigator.clipboard.writeText(link);
-                                addToast("Invite link copied to clipboard! 🔗", 'success');
+                                try {
+                                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                                        await navigator.clipboard.writeText(link);
+                                    } else {
+                                        const textArea = document.createElement('textarea');
+                                        textArea.value = link;
+                                        textArea.style.position = 'fixed';
+                                        textArea.style.left = '-9999px';
+                                        document.body.appendChild(textArea);
+                                        textArea.select();
+                                        document.execCommand('copy');
+                                        document.body.removeChild(textArea);
+                                    }
+                                    addToast("Invite link copied to clipboard! 🔗", 'success');
+                                } catch (err) {
+                                    addToast(link, 'info', 10000);
+                                }
                             }}
                             className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm font-medium text-gold/80 hover:text-gold"
                         >

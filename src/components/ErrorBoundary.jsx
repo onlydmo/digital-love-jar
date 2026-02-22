@@ -1,4 +1,5 @@
 import React from 'react';
+import { safeClear } from '../lib/safeStorage';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -39,7 +40,7 @@ class ErrorBoundary extends React.Component {
                     </pre>
                     <button
                         onClick={() => {
-                            localStorage.clear();
+                            safeClear();
                             window.location.reload();
                         }}
                         className="mt-8 px-6 py-3 bg-white text-red-900 font-bold rounded"

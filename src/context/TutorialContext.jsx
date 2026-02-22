@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { safeGetItem, safeSetItem, safeRemoveItem } from '../lib/safeStorage';
 
 const TutorialContext = createContext();
 
@@ -10,7 +11,7 @@ export const TutorialProvider = ({ children }) => {
     const seenTutorialsRef = React.useRef([]); // Ref to track seen without triggering re-renders of consumers
 
     useEffect(() => {
-        const stored = localStorage.getItem('love_jar_tutorials');
+        const stored = safeGetItem('love_jar_tutorials');
         if (stored) {
             const parsed = JSON.parse(stored);
             setSeenTutorials(parsed);
@@ -35,7 +36,7 @@ export const TutorialProvider = ({ children }) => {
             const newSeen = [...seenTutorials, activeTutorial];
             setSeenTutorials(newSeen);
             seenTutorialsRef.current = newSeen; // Update ref immediately
-            localStorage.setItem('love_jar_tutorials', JSON.stringify(newSeen));
+            safeSetItem('love_jar_tutorials', JSON.stringify(newSeen));
             setActiveTutorial(null);
         }
     };
@@ -44,7 +45,7 @@ export const TutorialProvider = ({ children }) => {
     const resetTutorials = () => {
         setSeenTutorials([]);
         seenTutorialsRef.current = [];
-        localStorage.removeItem('love_jar_tutorials');
+        safeRemoveItem('love_jar_tutorials');
         window.location.reload();
     };
 

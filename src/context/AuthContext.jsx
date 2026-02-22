@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { safeGetItem, safeSetItem, safeRemoveItem } from '../lib/safeStorage';
 
 const AuthContext = createContext();
 
@@ -19,7 +20,7 @@ export const AuthProvider = ({ children }) => {
             if (session) {
                 console.log("[Auth] Session found:", session.user.id);
                 // Prioritize the couple matching our local code if we have one
-                const storedCode = localStorage.getItem('love_jar_code');
+                const storedCode = safeGetItem('love_jar_code');
                 let query = supabase.from('couples').select('*');
 
                 if (storedCode) {
@@ -38,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
             // 2. Legacy/Link Flow: Check valid code in LocalStorage or URL
             const urlParams = new URLSearchParams(window.location.search);
-            const secretCode = urlParams.get('code') || localStorage.getItem('love_jar_code');
+            const secretCode = urlParams.get('code') || safeGetItem('love_jar_code');
 
             if (secretCode) {
                 console.log("[Auth] Found legacy/invite code. Attempting to link...");
@@ -50,7 +51,7 @@ export const AuthProvider = ({ children }) => {
                         window.history.replaceState({}, document.title, "/");
                     }
                 } else {
-                    localStorage.removeItem('love_jar_code');
+                    safeRemoveItem('love_jar_code');
                 }
             }
 
@@ -76,7 +77,7 @@ export const AuthProvider = ({ children }) => {
         if (!error && data?.success) {
             console.log("[Auth] Link Success!", data.couple);
             setCouple(data.couple);
-            localStorage.setItem('love_jar_code', code); // Keep for UI reference/sharing
+            safeSetItem('love_jar_code', code); // Keep for UI reference/sharing
             return true;
         } else {
             console.error("[Auth] RPC Link Failed:", error || data?.message);
@@ -89,7 +90,7 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         await supabase.auth.signOut();
         setCouple(null);
-        localStorage.removeItem('love_jar_code');
+        safeRemoveItem('love_jar_code');
         window.location.reload();
     };
 
@@ -116,7 +117,7 @@ export const AuthProvider = ({ children }) => {
 
         console.log("Couple created!", data.couple);
         setCouple(data.couple);
-        localStorage.setItem('love_jar_code', code);
+        safeSetItem('love_jar_code', code);
         return { success: true, data: data.couple };
     };
 
